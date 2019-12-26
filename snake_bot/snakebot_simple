@@ -1,0 +1,7 @@
+import pybullet as p
+cin = p.connect(p.SHARED_MEMORY)
+if (cin < 0):
+    cin = p.connect(p.GUI)
+p.setGravity(0.000000,0.000000,-9.800000)
+p.stepSimulation()
+p.disconnect()
