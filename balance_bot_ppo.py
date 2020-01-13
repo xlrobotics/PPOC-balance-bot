@@ -1,10 +1,11 @@
 import gym
 from stable_baselines import PPO2 as ppo2
-from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines.common.policies import MlpLnLstmPolicy
 from stable_baselines.common.vec_env import SubprocVecEnv
 import balance_bot
 
+import sys; print('Python %s on %s' % (sys.version, sys.platform))
+sys.path.extend(['D:\\projects\\python\\PPOC-balance-bot', 'D:/projects/python/PPOC-balance-bot'])
 
 def callback(lcl, glb):
     # stop training if reward exceeds 199
@@ -13,7 +14,7 @@ def callback(lcl, glb):
 
 def main(mode="train"):
 
-    n_cpu = 4
+    n_cpu = 2
     env = SubprocVecEnv([lambda: gym.make('balancebot-v0') for i in range(n_cpu)])
 
     if mode == "train":
@@ -22,7 +23,7 @@ def main(mode="train"):
                      learning_rate=1e-3,
                      verbose=0,
                      full_tensorboard_log=True,
-                     tensorboard_log="./ppo2_balancebot_tensorboard")
+                     tensorboard_log="ppo2_balancebot_tensorboard")
 
         model.learn(
             total_timesteps=100000,
@@ -48,4 +49,4 @@ def main(mode="train"):
 
 if __name__ == '__main__':
     main(mode="train")
-
+    exit(0)

@@ -4,6 +4,8 @@ from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines.deepq.policies import LnMlpPolicy
 import balance_bot
 
+import sys; print('Python %s on %s' % (sys.version, sys.platform))
+sys.path.extend(['D:\\projects\\python\\PPOC-balance-bot', 'D:/projects/python/PPOC-balance-bot'])
 
 def callback(lcl, glb):
     # stop training if reward exceeds 199
@@ -20,11 +22,11 @@ def main(mode="train"):
                       double_q=True,
                       prioritized_replay=True,
                       learning_rate=1e-3,
-                      buffer_size=10000,
+                      buffer_size=100,
                       verbose=0,
-                      tensorboard_log="./dqn_balancebot_tensorboard")
+                      tensorboard_log="dqn_balancebot_tensorboard")
         model.learn(
-            total_timesteps=200000,
+            total_timesteps=2000,
             callback=callback
         )
         print("Saving model to balance_dqn.pkl")
@@ -47,4 +49,4 @@ def main(mode="train"):
 
 if __name__ == '__main__':
     main(mode="train")
-
+    exit(0)

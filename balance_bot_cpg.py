@@ -23,19 +23,19 @@ def main(mode="train"):
                      learning_rate=1e-3,
                      verbose=0,
                      full_tensorboard_log=False,
-                     tensorboard_log="./ppo2_balancebot_tensorboard")
+                     tensorboard_log="./$CPG_PROJ$/ppo2_balancebot_tensorboard")
 
         model.learn(
             total_timesteps=200000,
             callback=callback
         )
         print("Saving model to ppo2_balance_cpg.pkl")
-        model.save("ppo2_balance_cpg.pkl")
+        model.save("$CPG_PROJ$/ppo2_balance_cpg.pkl")
 
         del model  # remove to demonstrate saving and loading
 
     if mode == "test":
-        model = ppo2.load("ppo2_balance_cpg.pkl")
+        model = ppo2.load("$CPG_PROJ$/ppo2_balance_cpg.pkl")
 
         obs = env.reset()
         done = [False, False]
