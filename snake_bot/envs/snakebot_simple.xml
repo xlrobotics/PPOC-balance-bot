@@ -176,40 +176,40 @@
     <parent link="link1"/>
     <child link="link2"/>
     <axis xyz="0 0 1"/>
-   <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
-   <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
+    <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
+    <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
   </joint>
 
   <joint name="l2_2_l3" type="continuous">
     <parent link="link2"/>
     <child link="link3"/>
     <axis xyz="0 0 1"/>
-   <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
-   <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
+    <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
+    <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
   </joint>
 
   <joint name="l3_2_l4" type="continuous">
     <parent link="link3"/>
     <child link="link4"/>
     <axis xyz="0 0 1"/>
-   <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
-   <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
+    <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
+    <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
   </joint>
 
-    <joint name="l4_2_l5" type="continuous">
+  <joint name="l4_2_l5" type="continuous">
     <parent link="link4"/>
     <child link="link5"/>
     <axis xyz="0 0 1"/>
-   <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
-   <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
+    <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
+    <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
   </joint>
 
-    <joint name="l5_2_l6" type="continuous">
+  <joint name="l5_2_l6" type="continuous">
     <parent link="link5"/>
     <child link="link6"/>
     <axis xyz="0 0 1"/>
-   <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
-   <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
+    <limit effort="1000.0" lower="-0.548" upper="0.548" velocity="0.0"/>
+    <origin rpy="0 0 0" xyz="0.0 0.22 0.0"/>
   </joint>
 
 

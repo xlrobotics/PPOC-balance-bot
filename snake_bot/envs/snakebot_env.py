@@ -19,7 +19,7 @@ class SnakebotEnv(gym.Env):
         'video.frames_per_second': 50
     }
 
-    def __init__(self, render=True, discrete=True, cpg=False, manual_mode=False, body_size=6, division=5):
+    def __init__(self, render=True, discrete=True, cpg=False, manual_mode=False, body_size=6, division=5, snake_urdf=None):
         self._observation = []
         self._manual_mode = manual_mode  # for manual control testing
         self._obs_buffer = [] #history poses for calculating averaged speed and heading angles
@@ -50,6 +50,8 @@ class SnakebotEnv(gym.Env):
 
         self._seed()
         self.default_done = 1500
+        self.snake_urdf = snake_urdf
+        self.body_size = body_size
         # paramId = p.addUserDebugParameter("My Param", 0, 100, 50)
 
     @property
@@ -71,6 +73,62 @@ class SnakebotEnv(gym.Env):
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
+
+    # embedded method to create the snake
+    def create_robot(self) -> int:
+        sphereRadius = 0.05
+        # colBoxId = p.createCollisionShapeArray([p.GEOM_BOX, p.GEOM_SPHERE],radii=[sphereRadius+0.03,sphereRadius+0.03],
+        #                                        halfExtents=[[sphereRadius,sphereRadius,sphereRadius],[sphereRadius,sphereRadius,sphereRadius]])
+        colBoxId = p.createCollisionShape(p.GEOM_BOX,
+                                          halfExtents=[sphereRadius, 2 * sphereRadius, sphereRadius])
+
+        useMaximalCoordinates = True
+        mass = 1
+        visualShapeId = -1
+
+        link_Masses = []
+        linkCollisionShapeIndices = []
+        linkVisualShapeIndices = []
+        linkPositions = []
+        linkOrientations = []
+        linkInertialFramePositions = []
+        linkInertialFrameOrientations = []
+        indices = []
+        jointTypes = []
+        axis = []
+
+        for i in range(self.body_size):  #
+            link_Masses.append(1)
+            linkCollisionShapeIndices.append(colBoxId)
+            linkVisualShapeIndices.append(-1)
+            linkPositions.append([0, sphereRadius * 4.0 + 0.01, 0])
+            linkOrientations.append([0, 0, 0, 1])
+            linkInertialFramePositions.append([0, 0, 0])
+            linkInertialFrameOrientations.append([0, 0, 0, 1])
+            indices.append(i)
+            jointTypes.append(p.JOINT_REVOLUTE)
+            axis.append([0, 0, 1])
+
+        basePosition = [0, 0, 0]
+        baseOrientation = [0, 0, 0, 1]
+        botId = p.createMultiBody(mass,
+                                      colBoxId,
+                                      visualShapeId,
+                                      basePosition,
+                                      baseOrientation,
+                                      linkMasses=link_Masses,
+                                      linkCollisionShapeIndices=linkCollisionShapeIndices,
+                                      linkVisualShapeIndices=linkVisualShapeIndices,
+                                      linkPositions=linkPositions,
+                                      linkOrientations=linkOrientations,
+                                      linkInertialFramePositions=linkInertialFramePositions,
+                                      linkInertialFrameOrientations=linkInertialFrameOrientations,
+                                      linkParentIndices=indices,
+                                      linkJointTypes=jointTypes,
+                                      linkJointAxis=axis,
+                                      useMaximalCoordinates=useMaximalCoordinates)
+
+        return botId
 
     def step(self, action):
 
@@ -125,9 +183,12 @@ class SnakebotEnv(gym.Env):
 
         path = os.path.abspath(os.path.dirname(__file__))
 
-        self._botId = p.loadURDF(os.path.join(path, "snakebot_simple.xml"),
-                                cubeStartPos,
-                                cubeStartOrientation)
+        if self.snake_urdf is not None:
+            self._botId = p.loadURDF(os.path.join(path, self.snake_urdf),  # "snakebot_simple.xml"
+                                    cubeStartPos,
+                                    cubeStartOrientation)
+        else:
+            self._botId = self.create_robot()
 
         anistropicFriction = [1, 0.01, 0.01]
         p.changeDynamics(self.botId, -1, lateralFriction=2, anisotropicFriction=anistropicFriction)
@@ -148,6 +209,11 @@ class SnakebotEnv(gym.Env):
                 self.paramIds.append(p.addUserDebugParameter(jointName.decode("utf-8"), -1, 1, 0.))
                 p.resetJointState(self.botId, i, 0.)
 
+        p.addUserDebugParameter(b"amplitude".decode("utf-8"), -1, 1, 0.)
+        p.addUserDebugParameter(b"frequency".decode("utf-8"), 0, 1, 0.)
+        p.addUserDebugParameter(b"alpha".decode("utf-8"), 0, 1, 0.)
+        p.addUserDebugParameter(b"offset".decode("utf-8"), -1, 1, 0.)
+
         # you *have* to compute and return the observation from reset()
         self._observation = self._compute_observation()
         self._obs_buffer.append(self._observation)
@@ -161,11 +227,14 @@ class SnakebotEnv(gym.Env):
         while(1):
             keys = p.getKeyboardEvents()
             p.getCameraImage(320, 200)
-            p.setGravity(0, 0, p.readUserDebugParameter(self.gravId))
+            # p.setGravity(0, 0, p.readUserDebugParameter(self.gravId))
             for i in range(len(self.paramIds)):
                 c = self.paramIds[i]
                 targetPos = p.readUserDebugParameter(c)
                 p.setJointMotorControl2(self.botId, self.jointIds[i], p.POSITION_CONTROL, targetPos, force=30.)
+
+            targetAmp = p.readUserDebugParameter(c)
+
             time.sleep(0.01)
 
             for k, v in keys.items():
